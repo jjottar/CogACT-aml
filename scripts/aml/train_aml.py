@@ -35,6 +35,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 
+# TODO: I don't think this is necessary. hugging face will check the HF_TOKEN environment variable automatically.
 def setup_hf_token():
     """Set up HuggingFace authentication."""
     hf_token = os.environ.get("HF_TOKEN")
@@ -52,6 +53,9 @@ def setup_hf_token():
     logger.info("HuggingFace authentication configured")
 
 
+# TODO: This is useful. However, we shouldn't have to check many variables everytime.
+# We should figure our what is the correct variable and use that without this function.
+# So, while this function is useful I dont think we should use it in the final version.
 def resolve_input_mount(env_var_names, description):
     """Resolve AzureML input mount from environment variables."""
     for env_var in env_var_names:
@@ -64,6 +68,7 @@ def resolve_input_mount(env_var_names, description):
     return None
 
 
+# TODO: If we merge the COGACT_CHECKPOINTS and HF_HOME env variables, we don't need this function.
 def setup_model_cache(hf_cache_dir, output_dir):
     """Set up HuggingFace model cache using dedicated cache mount or output directory."""
     if hf_cache_dir:
@@ -87,6 +92,8 @@ def setup_model_cache(hf_cache_dir, output_dir):
         raise ValueError("No cache directory available")
 
 
+# TODO: Again, this is useful. However, we should not have to check if the files exist, we should just know that they do.
+# So I think we should figure out where the files are exactly (which subdirectory of base_dir) and use that directly.
 def find_checkpoint_in_directory(base_dir, description="checkpoint"):
     """
     Find CogACT checkpoint files in a directory structure.
@@ -153,6 +160,8 @@ def find_checkpoint_in_directory(base_dir, description="checkpoint"):
     return None
 
 
+# TODO: If we merge the COGACT_CHECKPOINTS and HF_HOME env variables,
+# we don't need to check both model_checkpoints_dir and hf_cache_dir.
 def resolve_pretrained_checkpoint(model_checkpoints_dir, hf_cache_dir, pretrained_checkpoint):
     """
     Resolve pretrained checkpoint using a fallback strategy.
@@ -271,6 +280,7 @@ def main():
     setup_hf_token()
 
     # Resolve input/output mounts
+    # TODO: Like I said in the comments of resolve_input_mount(), we should already know the correct variables to use.
     model_checkpoints_dir = resolve_input_mount(
         ["AZURE_ML_INPUT_COGACT_CHECKPOINTS_DIR", "COGACT_CHECKPOINTS_DIR", "cogact_checkpoints_dir"],
         "model checkpoints",
@@ -284,9 +294,11 @@ def main():
     )
 
     # Set up model cache
+    # TODO: If we set HF_HOME, we don't need to set up the model cache, it should already be set up.
     setup_model_cache(hf_cache_dir, output_dir)
 
     # Debug: Show what's available in both potential checkpoint locations
+    # TODO: This is mostly debugging information, we should not need to show this in the final version.
     if model_checkpoints_dir:
         logger.info("Contents of cogact_checkpoints_dir (%s):", model_checkpoints_dir)
         try:

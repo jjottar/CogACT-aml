@@ -35,16 +35,25 @@ environment_variables:
   PYTHONUNBUFFERED: "1"
   # This variable will be used by the wrapper script which passes "HF_TOKEN" (the name, not the value) to the training script so it can look it up correctly in the environment. It should be passed when submitting the job using: --set environment_variables.HF_TOKEN=$HF_TOKEN
   HF_TOKEN: ${HF_TOKEN}
+
   # Set up checkpoints directory (read-only, for pre-downloaded CogACT checkpoints)
+  
+  # TODO: Doesn't look like we need both COGACT_CHECKPOINTS and HF_HOME. Should be merged into one variable. 
   COGACT_CHECKPOINTS: ${{inputs.cogact_checkpoints_dir}}
   # HuggingFace cache directory (dedicated writable mount)
   HF_HOME: ${{outputs.hf_cache_dir}}
-  TRANSFORMERS_CACHE: ${{outputs.hf_cache_dir}}/transformers
-  HUGGINGFACE_HUB_CACHE: ${{outputs.hf_cache_dir}}/hub
+  
+  # TODO: I don't think these 2 env vars are needed.
+  #TRANSFORMERS_CACHE: ${{outputs.hf_cache_dir}}/transformers
+  #HUGGINGFACE_HUB_CACHE: ${{outputs.hf_cache_dir}}/hub
+  
   # Finteuning dataset directory mount point
   DATASET_DIR: ${{inputs.dataset_dir}}
+
+  # TODO: I'm nitpicking but it's easier to understand what is what if the env var and output are the same. i.e. TRAINING_OUTPUT_DIR: ${{outputs.training_output_dir}}
   # Save training outputs (checkpoints and logs) separately 
   TRAINING_OUTPUT_DIR: ${{outputs.checkpoints_dir}}
+  
   # Distributed training settings
   GPU_COUNT: "4"  # Set explicit GPU count per node for distributed training
   NCCL_DEBUG: "INFO"
